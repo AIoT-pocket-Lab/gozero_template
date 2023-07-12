@@ -10,7 +10,7 @@ import (
     "go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-{{if .Cache}}var prefix{{.Type}}CacheKey = "cache:{{.lowerType}}:"{{end}}
+{{if .Cache}}var cache{{.Type}}Prefix = "cache:{{.lowerType}}:"{{end}}
 
 type {{.lowerType}}Model interface{
     Insert(ctx context.Context,data *{{.Type}}) error
@@ -35,7 +35,7 @@ func (m *default{{.Type}}Model) Insert(ctx context.Context, data *{{.Type}}) err
         data.UpdateTime = time.Now()
     }
 
-    {{if .Cache}}key := prefix{{.Type}}CacheKey + data.Id.Hex(){{end}}
+    {{if .Cache}}key := cache{{.Type}}Prefix + data.Id.Hex(){{end}}
     _, err := m.conn.InsertOne(ctx, {{if .Cache}}key, {{end}} data)
     return err
 }
@@ -47,7 +47,7 @@ func (m *default{{.Type}}Model) FindOne(ctx context.Context, id string) (*{{.Typ
     }
 
     var data {{.Type}}
-    {{if .Cache}}key := prefix{{.Type}}CacheKey + id{{end}}
+    {{if .Cache}}key := cache{{.Type}}Prefix + id{{end}}
     err = m.conn.FindOne(ctx, {{if .Cache}}key, {{end}}&data, bson.M{"_id": oid})
     switch err {
     case nil:
@@ -61,7 +61,7 @@ func (m *default{{.Type}}Model) FindOne(ctx context.Context, id string) (*{{.Typ
 
 func (m *default{{.Type}}Model) Update(ctx context.Context, data *{{.Type}}) error {
     data.UpdateTime = time.Now()
-    {{if .Cache}}key := prefix{{.Type}}CacheKey + data.Id.Hex(){{end}}
+    {{if .Cache}}key := cache{{.Type}}Prefix + data.Id.Hex(){{end}}
     _, err := m.conn.ReplaceOne(ctx, {{if .Cache}}key, {{end}}bson.M{"_id": data.Id}, data)
     return err
 }
@@ -71,7 +71,7 @@ func (m *default{{.Type}}Model) Delete(ctx context.Context, id string) error {
     if err != nil {
         return ErrInvalidObjectId
     }
-	{{if .Cache}}key := prefix{{.Type}}CacheKey +id{{end}}
+	{{if .Cache}}key := cache{{.Type}}Prefix +id{{end}}
     _, err = m.conn.DeleteOne(ctx, {{if .Cache}}key, {{end}}bson.M{"_id": oid})
 	return err
 }
