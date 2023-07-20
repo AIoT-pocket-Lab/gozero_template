@@ -31,8 +31,8 @@ func newDefault{{.Type}}Model(conn {{if .Cache}}*monc.Model{{else}}*mon.Model{{e
 func (m *default{{.Type}}Model) Insert(ctx context.Context, data *{{.Type}}) error {
     if data.Id.IsZero() {
         data.Id = primitive.NewObjectID()
-        data.CreateTime = time.Now()
-        data.UpdateTime = time.Now()
+        data.CreateTime = time.Now().UTC().Add(time.Hour * 8) // 将UTC时间加上8个小时即可得到中国标准时间
+        data.UpdateTime = time.Now().UTC().Add(time.Hour * 8) // 将UTC时间加上8个小时即可得到中国标准时间
     }
 
     {{if .Cache}}key := cache{{.Type}}Prefix + data.Id.Hex(){{end}}
@@ -60,7 +60,7 @@ func (m *default{{.Type}}Model) FindOne(ctx context.Context, id string) (*{{.Typ
 }
 
 func (m *default{{.Type}}Model) Update(ctx context.Context, data *{{.Type}}) error {
-    data.UpdateTime = time.Now()
+    data.UpdateTime = time.Now().UTC().Add(time.Hour * 8) // 将UTC时间加上8个小时即可得到中国标准时间
     {{if .Cache}}key := cache{{.Type}}Prefix + data.Id.Hex(){{end}}
     _, err := m.conn.ReplaceOne(ctx, {{if .Cache}}key, {{end}}bson.M{"_id": data.Id}, data)
     return err
