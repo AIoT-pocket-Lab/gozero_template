@@ -51,6 +51,8 @@ func (m *default{{.Type}}Model) FindOne(ctx context.Context, id string) (*{{.Typ
     err = m.conn.FindOne(ctx, {{if .Cache}}key, {{end}}&data, bson.M{"_id": oid})
     switch err {
     case nil:
+        data.CreateTime = data.CreateTime.Add(-(time.Hour * 8))
+		data.UpdateTime = data.UpdateTime.Add(-(time.Hour * 8))
         return &data, nil
     case {{if .Cache}}monc{{else}}mon{{end}}.ErrNotFound:
         return nil, ErrNotFound
