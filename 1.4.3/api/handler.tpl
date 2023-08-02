@@ -3,7 +3,7 @@ package {{.PkgName}}
 import (
     "net/http"
 
-    "AIoT-pocket_server/common/responsex"
+    "zyda-iot_server/common/responsex"
     {{.ImportPackages}}
 
 	"github.com/zeromicro/go-zero/rest/httpx"
