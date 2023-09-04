@@ -62,6 +62,7 @@ func (m *default{{.Type}}Model) FindOne(ctx context.Context, id string) (*{{.Typ
 }
 
 func (m *default{{.Type}}Model) Update(ctx context.Context, data *{{.Type}}) error {
+    data.CreateTime = data.CreateTime.Add(time.Hour * 8)
     data.UpdateTime = time.Now().UTC().Add(time.Hour * 8) // 将UTC时间加上8个小时即可得到中国标准时间
     {{if .Cache}}key := cache{{.Type}}Prefix + data.Id.Hex(){{end}}
     _, err := m.conn.ReplaceOne(ctx, {{if .Cache}}key, {{end}}bson.M{"_id": data.Id}, data)
